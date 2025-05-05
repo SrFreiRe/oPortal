@@ -1,0 +1,58 @@
+
+
+### Register a new user
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "John_Doe",
+  "email": "john@example.com",
+  "password": "Password123",
+  "passwordConfirm": "Password123"
+}
+
+### Login (this will set cookies for subsequent requests)
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "Password123!"
+}
+
+### Get the current user profile
+GET http://localhost:3000/api/v1/auth/me
+
+### Get user's content
+GET http://localhost:3000/api/v1/content/me
+
+### Create new content
+POST http://localhost:3000/api/v1/content
+Content-Type: application/json
+
+{
+  "title": "My First Post",
+  "body": "This is the content of my first post",
+  "tags": ["test", "example"]
+}
+
+### Get all content
+GET http://localhost:3000/api/v1/content
+
+### Get content by ID
+GET http://localhost:3000/api/v1/content/{{contentId}}
+
+### Update content
+PATCH http://localhost:3000/api/v1/content/{{contentId}}
+Content-Type: application/json
+
+{
+  "title": "Updated Post Title",
+  "body": "This content has been updated"
+}
+
+### Delete content
+DELETE http://localhost:3000/api/v1/content/{{contentId}}
+
+### Logout
+POST http://localhost:3000/api/v1/auth/logout
