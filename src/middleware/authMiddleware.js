@@ -53,16 +53,13 @@ const protect = async (req, res, next) => {
 };
 
 /**
- * Middleware para restringir el acceso a rutas según los roles de usuario
+ * Middleware para restringir acceso basado en roles
  * @param  {...string} roles - Roles permitidos
  */
 const restrictTo = (...roles) => {
   return (req, res, next) => {
-    // roles es un array, por ejemplo: ['admin', 'editor']
     if (!roles.includes(req.user.role)) {
-      return next(
-        new AppError('No tiene permiso para realizar esta acción', 403)
-      );
+      return next(new AppError('No tienes permiso para realizar esta acción', 403));
     }
     next();
   };

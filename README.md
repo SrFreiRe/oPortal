@@ -9,7 +9,6 @@ API RESTful moderna para autenticación y gestión de contenido personalizado, d
 - **Gestión de Contenido**: Operaciones CRUD completas con soporte para contenido personalizado
 - **Validación de Entrada**: Esquemas Zod para validar todas las entradas
 - **Seguridad**: Implementación de mejores prácticas de seguridad (CORS, Helmet, sanitización)
-- **Personalización**: Soporte para preferencias de usuario y contenido personalizado
 - **Manejo de Errores**: Sistema robusto y consistente de manejo de errores
 - **Logging**: Registro estructurado para facilitar la depuración
 
@@ -89,14 +88,18 @@ API RESTful moderna para autenticación y gestión de contenido personalizado, d
 - `GET /api/v1/content/me` - Obtener contenido del usuario actual
 - `GET /api/v1/content/user/:userId` - Obtener contenido de un usuario específico
 
-### Usuarios
+### Endpoints de Usuario
 
 - `GET /api/v1/users/me` - Obtener perfil del usuario actual
 - `PATCH /api/v1/users/me` - Actualizar perfil del usuario actual
-- `PATCH /api/v1/users/me/preferences` - Actualizar preferencias de personalización
 - `DELETE /api/v1/users/me` - Desactivar cuenta del usuario actual
-- `GET /api/v1/users` - Obtener lista de usuarios (solo admin)
-- `GET /api/v1/users/:id` - Obtener usuario por ID (solo admin)
+
+### Endpoints de Administrador
+
+- `GET /api/v1/users` - Listar todos los usuarios
+- `GET /api/v1/users/:id` - Obtener un usuario específico
+- `PATCH /api/v1/users/:id` - Actualizar un usuario específico
+- `DELETE /api/v1/users/:id` - Desactivar un usuario específico
 
 ## Seguridad
 

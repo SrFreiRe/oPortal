@@ -11,18 +11,6 @@ const userSchema = new mongoose.Schema(
       minlength: [3, 'El nombre de usuario debe tener al menos 3 caracteres'],
       maxlength: [20, 'El nombre de usuario no puede tener más de 20 caracteres'],
     },
-    email: {
-      type: String,
-      required: [true, 'Por favor ingrese un correo electrónico'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      // Validación básica de correo electrónico
-      match: [
-        /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-        'Por favor ingrese un correo electrónico válido',
-      ],
-    },
     password: {
       type: String,
       required: [true, 'Por favor ingrese una contraseña'],
@@ -31,12 +19,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'editor', 'admin'],
+      enum: ['user', 'admin'],
       default: 'user',
-    },
-    personalizationPreferences: {
-      type: Object,
-      default: {},
     },
     refreshTokens: [String], // Almacenar múltiples tokens de refresco
     passwordChangedAt: Date,

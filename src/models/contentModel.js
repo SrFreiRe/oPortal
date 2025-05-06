@@ -22,12 +22,6 @@ const contentSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    associatedUsers: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User'
-      }
-    ],
     metadata: {
       type: Object,
       default: {}
@@ -65,7 +59,6 @@ const contentSchema = new mongoose.Schema(
 
 // Índices para mejorar el rendimiento de las consultas
 contentSchema.index({ author: 1, createdAt: -1 });
-contentSchema.index({ associatedUsers: 1 });
 contentSchema.index({ tags: 1 });
 contentSchema.index({ title: 'text', body: 'text' });
 
@@ -107,14 +100,6 @@ contentSchema.pre('findOneAndUpdate', async function(next) {
   }
   
   next();
-});
-
-// Virtual para contenido personalizado
-contentSchema.virtual('isPersonalizedFor', {
-  ref: 'User',
-  localField: 'associatedUsers',
-  foreignField: '_id',
-  justOne: false
 });
 
 const Content = mongoose.model('Content', contentSchema);

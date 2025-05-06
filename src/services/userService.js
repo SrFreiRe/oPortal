@@ -24,7 +24,7 @@ const getUserById = async (userId) => {
  */
 const updateUserProfile = async (userId, updateData) => {
   // Campos permitidos para actualización
-  const allowedFields = ['username', 'personalizationPreferences'];
+  const allowedFields = ['username'];
   
   // Filtrar campos no permitidos
   const filteredData = {};
@@ -63,43 +63,6 @@ const updateUserProfile = async (userId, updateData) => {
   if (!updatedUser) {
     throw new AppError('Usuario no encontrado', 404);
   }
-  
-  return updatedUser;
-};
-
-/**
- * Actualizar preferencias de personalización del usuario
- * @param {string} userId - ID del usuario a actualizar
- * @param {Object} preferences - Preferencias a actualizar
- * @returns {Object} - Usuario actualizado
- */
-const updateUserPreferences = async (userId, preferences) => {
-  if (!preferences || Object.keys(preferences).length === 0) {
-    throw new AppError('No se proporcionaron preferencias para actualizar', 400);
-  }
-  
-  // Obtener usuario actual para fusionar preferencias
-  const user = await User.findById(userId);
-  
-  if (!user) {
-    throw new AppError('Usuario no encontrado', 404);
-  }
-  
-  // Fusionar preferencias existentes con las nuevas
-  const updatedPreferences = {
-    ...user.personalizationPreferences,
-    ...preferences
-  };
-  
-  // Actualizar usuario
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    { personalizationPreferences: updatedPreferences },
-    {
-      new: true,
-      runValidators: true
-    }
-  );
   
   return updatedUser;
 };
@@ -192,7 +155,6 @@ const listUsers = async (queryParams) => {
 module.exports = {
   getUserById,
   updateUserProfile,
-  updateUserPreferences,
   deactivateUser,
   listUsers
 };

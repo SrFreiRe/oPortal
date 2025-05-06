@@ -10,18 +10,6 @@ const mongoose = require('mongoose');
  * @returns {Object} - Contenido creado
  */
 const createContent = async (contentData, user) => {
-  // Verificar usuarios asociados si es personalizado
-  if (contentData.isPersonalized && contentData.associatedUsers?.length > 0) {
-    // Verificar que los IDs de usuario asociados sean válidos
-    const userCount = await User.countDocuments({
-      _id: { $in: contentData.associatedUsers }
-    });
-
-    if (userCount !== contentData.associatedUsers.length) {
-      throw new AppError('Uno o más usuarios asociados no existen', 400);
-    }
-  }
-
   // Crear contenido con el autor actual
   const newContent = await Content.create({
     ...contentData,
@@ -46,15 +34,9 @@ const getContentById = async (id, user) => {
 
   // Si es contenido personalizado, verificar acceso
   if (content.isPersonalized) {
-    // El autor siempre puede acceder
+    // El autor y los admins siempre pueden acceder
     const isAuthor = content.author._id.toString() === user._id.toString();
-    // Verificar si el usuario está en la lista de usuarios asociados
-    const isAssociated = content.associatedUsers.some(
-      userId => userId.toString() === user._id.toString()
-    );
-    
-    // Si no es el autor ni está asociado y no es admin, negar acceso
-    if (!isAuthor && !isAssociated && user.role !== 'admin') {
+    if (!isAuthor && user.role !== 'admin') {
       throw new AppError('No tiene permiso para acceder a este contenido', 403);
     }
   }
@@ -77,31 +59,15 @@ const updateContent = async (id, updateData, user) => {
     throw new AppError('Contenido no encontrado', 404);
   }
 
-  // Verificar permisos (solo el autor, editor o admin pueden actualizar)
-  const isAuthor = content.author._id.toString() === user._id.toString();
-  if (!isAuthor && user.role !== 'admin' && user.role !== 'editor') {
-    throw new AppError('No tiene permiso para actualizar este contenido', 403);
+  // Verificar permisos (solo el autor o admin pueden actualizar)
+  const isAuthor = content.author.toString() === user._id.toString();
+  if (!isAuthor && user.role !== 'admin') {
+    throw new AppError('No tienes permiso para actualizar este contenido', 403);
   }
 
-  // Si cambia isPersonalized o associatedUsers, hacer verificaciones adicionales
-  if (
-    (updateData.isPersonalized !== undefined || 
-     updateData.associatedUsers !== undefined) && 
-    user.role !== 'admin'
-  ) {
-    // Solo admins pueden cambiar el estado de personalización o usuarios asociados
+  // Si cambia isPersonalized, verificar permisos
+  if (updateData.isPersonalized !== undefined && user.role !== 'admin') {
     throw new AppError('No tiene permiso para cambiar la personalización del contenido', 403);
-  }
-
-  // Verificar usuarios asociados si se proporcionan
-  if (updateData.associatedUsers?.length > 0) {
-    const userCount = await User.countDocuments({
-      _id: { $in: updateData.associatedUsers }
-    });
-
-    if (userCount !== updateData.associatedUsers.length) {
-      throw new AppError('Uno o más usuarios asociados no existen', 400);
-    }
   }
 
   // Añadir quien actualizó el contenido
@@ -112,8 +78,8 @@ const updateContent = async (id, updateData, user) => {
     id,
     updateData,
     {
-      new: true, // Devolver el documento actualizado
-      runValidators: true // Ejecutar validadores
+      new: true,
+      runValidators: true
     }
   );
 
@@ -175,15 +141,13 @@ const queryContent = async (queryParams, user) => {
   if (queryParams.personalized === true) {
     filter.$or = [
       { author: user._id },
-      { associatedUsers: user._id },
-      { isPersonalized: false } // También incluir contenido no personalizado
+      { isPersonalized: false }
     ];
   } else {
     // Por defecto, excluir contenido personalizado para otros usuarios
     filter.$or = [
       { isPersonalized: false },
-      { author: user._id },
-      { associatedUsers: user._id }
+      { author: user._id }
     ];
   }
 
@@ -257,10 +221,7 @@ const getUserContent = async (userId, queryParams, currentUser) => {
 
   // Configurar filtro para contenido del usuario
   const filter = {
-    $or: [
-      { author: targetUserId },
-      { associatedUsers: targetUserId }
-    ]
+    author: targetUserId
   };
 
   // Aplicar filtros adicionales como en queryContent
